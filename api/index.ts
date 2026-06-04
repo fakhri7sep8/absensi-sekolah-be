@@ -1,9 +1,10 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../src/app.module'; // Pastikan path-nya bener mengarah ke src lo
 import { ExpressAdapter } from '@nestjs/platform-express';
 import express from 'express';
+import { AppModule } from '../src/app.module';
 
 const server = express();
+let cachedServer;
 
 export const createNestServer = async (expressInstance) => {
   const app = await NestFactory.create(
@@ -22,6 +23,10 @@ export const createNestServer = async (expressInstance) => {
 };
 
 export default async (req: any, res: any) => {
-  await createNestServer(server);
-  server(req, res);
+  if (!cachedServer) {
+    await createNestServer(server);
+    cachedServer = server;
+  }
+  return cachedServer(req, res);
 };
+

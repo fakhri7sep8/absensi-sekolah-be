@@ -16,7 +16,7 @@ import { Kelas } from './modules/kelas/kelas.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Kelas]),
+    // 1. KONEKSI UTAMA WAJIB DI PALING ATAS
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.DB_HOST || 'localhost',
@@ -27,7 +27,13 @@ import { Kelas } from './modules/kelas/kelas.entity';
       entities: [Guru, Siswa, Kelas, Absensi, Notifikasi],
       synchronize: process.env.NODE_ENV !== 'production',
       logging: false,
+      // 2. TAMBAHKAN CONFIG SSL INI BIAR BISA KONEK TIDB CLOUD
+      ssl: process.env.NODE_ENV === 'production' || process.env.DB_HOST !== 'localhost' 
+        ? { rejectUnauthorized: false } 
+        : false,
     }),
+    // 3. BARU SETELAHNYA BOLEH SEPERTI INI
+    TypeOrmModule.forFeature([Kelas]),
     AuthModule,
     AbsensiModule,
     KelasModule,
