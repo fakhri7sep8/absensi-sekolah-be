@@ -24,6 +24,12 @@ export class KelasController {
     return this.kelasService.findAll();
   }
 
+  @Get('init')
+  @Roles('guru', 'kepsek')
+  initDefaultKelas() {
+    return this.kelasService.seedDefaultKelas();
+  }
+
   @Get(':id')
   @Roles('guru', 'kepsek')
   findOne(@Param('id', ParseIntPipe) id: number) {
