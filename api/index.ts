@@ -28,5 +28,15 @@ export const createNestServer = async (expressInstance) => {
     },
     credentials: true,
   });
+  
+  // Vercel Serverless gak pakai app.listen(), tapi pakai app.init()
+  await app.init();
 };
 
+export default async (req: any, res: any) => {
+  if (!cachedServer) {
+    await createNestServer(server);
+    cachedServer = server;
+  }
+  return cachedServer(req, res);
+};
