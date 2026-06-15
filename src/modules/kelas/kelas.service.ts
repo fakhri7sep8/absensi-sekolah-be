@@ -36,16 +36,27 @@ export class KelasService {
   }
 
   /**
-   * Seed default kelas jika belum ada data.
-   * Format: 1A, 1B, 1C, 1D s/d 6A, 6B, 6C, 6D
+   * Seed default kelas: bersihkan duplikat, lalu pastikan 24 kelas (1A–6D) ada.
+   * Format: "1 A", "1 B", "1 C", "1 D" s/d "6 A", "6 B", "6 C", "6 D"
    */
   async seedDefaultKelas(): Promise<Kelas[]> {
-    const count = await this.kelasRepository.count();
-    if (count > 0) {
-      // Jika sudah ada data, return semua
-      return this.findAll();
+    // 1. Bersihkan duplikat — simpan hanya yang paling awal (id terkecil) per nama_kelas
+    const all = await this.kelasRepository.find({ order: { id: 'ASC' } });
+    const seen = new Set<string>();
+    const idsToDelete: number[] = [];
+    for (const k of all) {
+      const key = k.nama_kelas.trim().toLowerCase();
+      if (seen.has(key)) {
+        idsToDelete.push(k.id);
+      } else {
+        seen.add(key);
+      }
+    }
+    if (idsToDelete.length > 0) {
+      await this.kelasRepository.delete(idsToDelete);
     }
 
+    // 2. Daftar 24 kelas default
     const defaultKelas: CreateKelasDto[] = [];
     const suffixes = ['A', 'B', 'C', 'D'];
     for (let tingkat = 1; tingkat <= 6; tingkat++) {
@@ -57,12 +68,23 @@ export class KelasService {
       }
     }
 
-    const created: Kelas[] = [];
-    for (const item of defaultKelas) {
-      const kelas = this.kelasRepository.create(item);
-      const saved = await this.kelasRepository.save(kelas);
-      created.push(saved);
+    // 3. Ambil data yang sudah ada setelah cleanup
+    const existing = await this.kelasRepository.find();
+    const existingMap = new Map<string, Kelas>();
+    for (const k of existing) {
+      existingMap.set(k.nama_kelas.trim().toLowerCase(), k);
     }
-    return created;
+
+    // 4. Insert yang belum ada
+    for (const item of defaultKelas) {
+      const key = item.nama_kelas.trim().toLowerCase();
+      if (!existingMap.has(key)) {
+        const kelas = this.kelasRepository.create(item);
+        await this.kelasRepository.save(kelas);
+      }
+    }
+
+    // 5. Return semua data yang sudah bersih
+    return this.findAll();
   }
 }
