@@ -16,12 +16,12 @@ import { Guru } from './guru.entity';
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'secret_key_development',
       signOptions: {
-        expiresIn: 60 * 60 * 24 * 7, // 7 hari dalam detik
+        expiresIn: 60 * 60 * 24 * 7,
       },
     }),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JwtAuthGuard, RolesGuard],
-  exports: [AuthService, JwtAuthGuard, RolesGuard], // Export untuk dipakai modul lain
+  exports: [AuthService, JwtAuthGuard, RolesGuard],
 })
 export class AuthModule {}
