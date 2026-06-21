@@ -12,7 +12,7 @@ export class KelasService {
   ) {}
 
   findAll() {
-    return this.kelasRepository.find({ order: { id: 'ASC' } });
+    return this.kelasRepository.find({ order: { tingkat: 'ASC', nama_kelas: 'ASC' } });
   }
 
   async findOne(id: number) {

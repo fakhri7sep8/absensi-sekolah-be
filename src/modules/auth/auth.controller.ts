@@ -6,12 +6,6 @@ import { AuthResponseDto, ForgotPasswordDto, LoginDto, ResetPasswordDto } from '
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  /**
-   * Login endpoint
-   * POST /auth/login
-   * @param loginDto - Email dan password
-   * @returns Access token dan data guru
-   */
   @Post('login')
   async login(
     @Body(ValidationPipe) loginDto: LoginDto,

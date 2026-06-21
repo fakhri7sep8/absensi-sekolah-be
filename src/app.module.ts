@@ -25,10 +25,8 @@ import { Kelas } from './modules/kelas/kelas.entity';
       password: process.env.DB_PASSWORD || 'root',
       database: process.env.DB_NAME || 'absensi_sekolah',
       entities: [Guru, Siswa, Kelas, Absensi, Notifikasi],
-      // synchronize: process.env.NODE_ENV !== 'production',
       synchronize: process.env.NODE_ENV !== 'production',
       logging: false,
-      // 2. TAMBAHKAN CONFIG SSL INI BIAR BISA KONEK TIDB CLOUD
       ssl: process.env.NODE_ENV === 'production' || process.env.DB_HOST !== 'localhost' 
         ? { rejectUnauthorized: false } 
         : false,
